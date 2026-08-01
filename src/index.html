@@ -55,8 +55,8 @@
         <div class="file-tree" id="file-tree">
           <div class="tree-empty" id="tree-empty">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h9a2 2 0 012 2z"/></svg>
-            <p>Папка не открыта</p>
-            <button class="btn-open" id="btn-open-folder2">Открыть папку</button>
+            <p id="tree-empty-text">Папка не открыта</p>
+            <button class="btn-open" id="btn-open-folder2" data-i18n="welcomeOpen">Открыть папку</button>
           </div>
         </div>
       </div>
@@ -75,29 +75,58 @@
       <!-- Settings Panel -->
       <div class="panel hidden" id="panel-settings">
         <div class="panel-header">
-          <span class="panel-title">НАСТРОЙКИ</span>
+          <span class="panel-title" data-i18n="settings">НАСТРОЙКИ</span>
         </div>
         <div class="settings-list">
           <label class="setting-item">
-            <span>Размер шрифта</span>
-            <input type="number" id="set-fontsize" value="14" min="10" max="24" />
+            <span data-i18n="fontSize">Размер шрифта</span>
+            <div class="stepper">
+              <button class="stepper-btn" type="button" data-stepper="fontSize" data-step="-1">−</button>
+              <input type="number" id="set-fontsize" value="14" min="10" max="24" />
+              <button class="stepper-btn" type="button" data-stepper="fontSize" data-step="1">+</button>
+            </div>
           </label>
           <label class="setting-item">
-            <span>Табуляция</span>
-            <select id="set-tabsize">
-              <option value="2">2 пробела</option>
-              <option value="4" selected>4 пробела</option>
-            </select>
+            <span data-i18n="tabSize">Табуляция</span>
+            <div class="stepper">
+              <button class="stepper-btn" type="button" data-stepper="tabSize" data-step="-1">−</button>
+              <input type="number" id="set-tabsize" value="4" min="2" max="8" />
+              <button class="stepper-btn" type="button" data-stepper="tabSize" data-step="1">+</button>
+            </div>
           </label>
           <label class="setting-item">
-            <span>Перенос строк</span>
+            <span data-i18n="wordWrap">Перенос строк</span>
             <input type="checkbox" id="set-wordwrap" />
           </label>
           <label class="setting-item">
-            <span>Тема</span>
-            <select id="set-theme">
-              <option value="dark" selected>Catppuccin Dark</option>
-              <option value="light">Catppuccin Light</option>
+            <span data-i18n="theme">Тема</span>
+            <button class="theme-pill" type="button" id="theme-trigger">
+              <span id="theme-trigger-label">Default</span>
+            </button>
+          </label>
+          <div class="theme-popover hidden" id="theme-popover">
+            <button class="theme-option" type="button" data-theme-option="default">Default</button>
+            <button class="theme-option" type="button" data-theme-option="custom">Custom</button>
+            <div class="custom-theme-controls hidden" id="custom-theme-controls">
+              <label>
+                <span>Base</span>
+                <input type="color" id="custom-base-color" value="#111827" />
+              </label>
+              <label>
+                <span>Text</span>
+                <input type="color" id="custom-text-color" value="#f8fafc" />
+              </label>
+              <label>
+                <span>Accent</span>
+                <input type="color" id="custom-accent-color" value="#38bdf8" />
+              </label>
+            </div>
+          </div>
+          <label class="setting-item">
+            <span data-i18n="language">Язык</span>
+            <select id="set-language">
+              <option value="ru">Русский</option>
+              <option value="en">English</option>
             </select>
           </label>
         </div>
@@ -126,21 +155,21 @@
           <div class="welcome-content">
             <div class="welcome-logo">SE</div>
             <h1>ScoreCode</h1>
-            <p>Лёгкий редактор кода</p>
+            <p id="welcome-message" data-i18n="welcomeTitle">Лёгкий редактор кода</p>
             <div class="welcome-actions">
-              <button class="welcome-btn" id="btn-open-folder3">
+              <button class="welcome-btn" id="btn-open-folder3" data-i18n="welcomeOpen">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h9a2 2 0 012 2z"/></svg>
                 Открыть папку
               </button>
-              <button class="welcome-btn" id="btn-new-file2">
+              <button class="welcome-btn" id="btn-new-file2" data-i18n="welcomeNewFile">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                 Новый файл
               </button>
             </div>
             <div class="welcome-shortcuts">
-              <div class="shortcut"><kbd>Ctrl+S</kbd><span>Сохранить</span></div>
-              <div class="shortcut"><kbd>Ctrl+W</kbd><span>Закрыть вкладку</span></div>
-              <div class="shortcut"><kbd>Ctrl+Tab</kbd><span>Следующая вкладка</span></div>
+              <div class="shortcut"><kbd>Ctrl+S</kbd><span data-i18n-shortcut="save">Сохранить</span></div>
+              <div class="shortcut"><kbd>Ctrl+W</kbd><span data-i18n-shortcut="close">Закрыть вкладку</span></div>
+              <div class="shortcut"><kbd>Ctrl+Tab</kbd><span data-i18n-shortcut="next">Следующая вкладка</span></div>
             </div>
           </div>
         </div>

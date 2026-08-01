@@ -379,6 +379,97 @@ select option { background: var(--mantle); color: var(--text); }
 }
 .shortcut span { font-size: 12px; color: var(--overlay0); }
 
+/* ===== SETTINGS ===== */
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 10px 12px;
+  position: relative;
+}
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--subtext0);
+}
+.setting-item input[type="number"], .setting-item select {
+  width: 82px;
+  padding: 5px 7px;
+  background: var(--surface0);
+  border: 1px solid var(--surface1);
+  border-radius: 6px;
+  color: var(--text);
+}
+.setting-item input[type="checkbox"] {
+  accent-color: var(--custom-accent, var(--blue));
+}
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.stepper-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--surface0);
+  border: 1px solid var(--surface1);
+  color: var(--text);
+}
+.theme-pill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--surface0);
+  border: 1px solid var(--surface1);
+  color: var(--text);
+  font-size: 12px;
+}
+.theme-popover {
+  margin: 4px 0 0;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--surface0);
+  border: 1px solid var(--surface1);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+  z-index: 20;
+}
+.theme-option {
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  background: transparent;
+}
+.theme-option:hover { background: var(--surface1); }
+.custom-theme-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+.custom-theme-controls label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--subtext0);
+}
+.custom-theme-controls input[type="color"] {
+  width: 36px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+.hidden { display: none !important; }
+
 /* ===== CODE EDITOR ===== */
 .editor-container {
   width: 100%; height: 100%;

@@ -17,6 +17,8 @@ const state = {
   fontSize: 14,
   tabSize: 4,
   wordWrap: false,
+  theme: 'default',
+  language: 'ru',
 };
 
 // ===== DOM =====
@@ -40,7 +42,14 @@ const els = {
   setFontsize:     document.getElementById('set-fontsize'),
   setTabsize:      document.getElementById('set-tabsize'),
   setWordwrap:     document.getElementById('set-wordwrap'),
-  setTheme:        document.getElementById('set-theme'),
+  setLanguage:     document.getElementById('set-language'),
+  themeTrigger:    document.getElementById('theme-trigger'),
+  themePopover:    document.getElementById('theme-popover'),
+  customThemeControls: document.getElementById('custom-theme-controls'),
+  customBaseColor: document.getElementById('custom-base-color'),
+  customTextColor: document.getElementById('custom-text-color'),
+  customAccentColor: document.getElementById('custom-accent-color'),
+  themeTriggerLabel: document.getElementById('theme-trigger-label'),
   resizeHandle:    document.getElementById('resize-handle'),
   sidebar:         document.getElementById('sidebar'),
 };
@@ -124,7 +133,7 @@ function activateTab(id) {
   if (!tab) return;
   els.editorTextarea.value = tab.content;
   els.statusLang.textContent = getLang(tab.name);
-  els.titlebarTitle.textContent = tab.name + ' — ScoreEdit';
+  els.titlebarTitle.textContent = tab.name + ' — ScoreCode';
   updateGutter();
   renderTabs();
   updateActiveFileInTree(tab.path);
@@ -142,7 +151,7 @@ function closeTab(id) {
       els.statusLang.textContent = getLang(next.name);
     } else {
       els.editorTextarea.value = '';
-      els.titlebarTitle.textContent = 'ScoreEdit';
+      els.titlebarTitle.textContent = 'ScoreCode';
     }
   }
   renderTabs();
@@ -282,17 +291,122 @@ function applyFontSize(size) {
   state.fontSize = size;
   els.editorTextarea.style.fontSize = size + 'px';
   els.editorGutter.style.fontSize   = size + 'px';
+  els.setFontsize.value = size;
 }
 function applyTabSize(size) {
   state.tabSize = size;
   els.editorTextarea.style.tabSize = size;
+  els.setTabsize.value = size;
 }
 function applyWordWrap(on) {
   state.wordWrap = on;
   els.editorTextarea.style.whiteSpace = on ? 'pre-wrap' : 'pre';
+  els.setWordwrap.checked = on;
 }
 function applyTheme(theme) {
+  state.theme = theme;
   document.documentElement.setAttribute('data-theme', theme);
+  if (theme === 'custom') {
+    els.customThemeControls.classList.remove('hidden');
+    applyCustomTheme();
+  } else {
+    els.customThemeControls.classList.add('hidden');
+    document.documentElement.style.removeProperty('--custom-base');
+    document.documentElement.style.removeProperty('--custom-text');
+    document.documentElement.style.removeProperty('--custom-accent');
+  }
+  if (els.themeTriggerLabel) els.themeTriggerLabel.textContent = theme === 'custom' ? 'Custom' : 'Default';
+}
+function applyCustomTheme() {
+  const base = els.customBaseColor?.value || '#111827';
+  const text = els.customTextColor?.value || '#f8fafc';
+  const accent = els.customAccentColor?.value || '#38bdf8';
+  document.documentElement.style.setProperty('--custom-base', base);
+  document.documentElement.style.setProperty('--custom-text', text);
+  document.documentElement.style.setProperty('--custom-accent', accent);
+}
+function setLanguage(lang) {
+  state.language = lang;
+  document.documentElement.lang = lang;
+  const map = {
+    ru: {
+      settings: 'НАСТРОЙКИ',
+      fontSize: 'Размер шрифта',
+      tabSize: 'Табуляция',
+      wordWrap: 'Перенос строк',
+      theme: 'Тема',
+      language: 'Язык',
+      openFolder: 'Открыть папку',
+      newFile: 'Новый файл',
+      newFolder: 'Новая папка',
+      emptyState: 'Папка не открыта',
+      welcomeTitle: 'Лёгкий редактор кода',
+      welcomeOpen: 'Открыть папку',
+      welcomeNewFile: 'Новый файл',
+      save: 'Сохранить',
+      closeTab: 'Закрыть вкладку',
+      nextTab: 'Следующая вкладка',
+      searchPlaceholder: 'Найти в файлах...',
+      noResults: 'Ничего не найдено',
+      noErrors: '✓ Нет ошибок',
+      text: 'Текст',
+      utf8: 'UTF-8'
+    },
+    en: {
+      settings: 'SETTINGS',
+      fontSize: 'Font size',
+      tabSize: 'Tab size',
+      wordWrap: 'Word wrap',
+      theme: 'Theme',
+      language: 'Language',
+      openFolder: 'Open folder',
+      newFile: 'New file',
+      newFolder: 'New folder',
+      emptyState: 'No folder open',
+      welcomeTitle: 'A lightweight code editor',
+      welcomeOpen: 'Open folder',
+      welcomeNewFile: 'New file',
+      save: 'Save',
+      closeTab: 'Close tab',
+      nextTab: 'Next tab',
+      searchPlaceholder: 'Search in files...',
+      noResults: 'Nothing found',
+      noErrors: '✓ No errors',
+      text: 'Text',
+      utf8: 'UTF-8'
+    }
+  };
+
+  const labels = document.querySelectorAll('[data-i18n]');
+  labels.forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (map[lang][key]) el.textContent = map[lang][key];
+  });
+
+  document.getElementById('search-input')?.setAttribute('placeholder', map[lang].searchPlaceholder);
+  document.getElementById('tree-empty-text')?.replaceChildren(document.createTextNode(map[lang].emptyState));
+  document.getElementById('welcome-message')?.replaceChildren(document.createTextNode(map[lang].welcomeTitle));
+  document.getElementById('btn-open-folder2') && (document.getElementById('btn-open-folder2').textContent = map[lang].welcomeOpen);
+  document.getElementById('btn-open-folder3') && (document.getElementById('btn-open-folder3').textContent = map[lang].welcomeOpen);
+  document.getElementById('btn-new-file2') && (document.getElementById('btn-new-file2').textContent = map[lang].welcomeNewFile);
+  document.getElementById('btn-open-folder')?.setAttribute('title', map[lang].openFolder);
+  document.getElementById('btn-new-file')?.setAttribute('title', map[lang].newFile);
+  document.getElementById('btn-new-folder')?.setAttribute('title', map[lang].newFolder);
+  document.getElementById('btn-save')?.setAttribute('title', `${map[lang].save} (Ctrl+S)`);
+  document.getElementById('status-errors') && (document.getElementById('status-errors').textContent = map[lang].noErrors);
+  document.getElementById('status-lang') && (document.getElementById('status-lang').textContent = map[lang].text);
+  document.getElementById('status-encoding') && (document.getElementById('status-encoding').textContent = map[lang].utf8);
+
+  const shortcutLabels = document.querySelectorAll('[data-i18n-shortcut]');
+  shortcutLabels.forEach(el => {
+    const key = el.getAttribute('data-i18n-shortcut');
+    const values = {
+      save: { ru: 'Сохранить', en: 'Save' },
+      close: { ru: 'Закрыть вкладку', en: 'Close tab' },
+      next: { ru: 'Следующая вкладка', en: 'Next tab' }
+    };
+    if (values[key]) el.textContent = values[key][lang];
+  });
 }
 
 // ===== ACTIVITY BAR (panels) =====
@@ -360,6 +474,24 @@ function newUntitledFile() {
   activateTab(id);
 }
 
+async function createNewFolder() {
+  if (!state.rootPath) {
+    await openFolder();
+    if (!state.rootPath) return;
+  }
+  const promptText = state.language === 'ru' ? 'Название новой папки:' : 'New folder name:';
+  const folderName = window.prompt(promptText);
+  if (!folderName) return;
+  const target = `${state.rootPath}/${folderName}`;
+  try {
+    await invoke('create_folder', { path: target });
+    await renderFileTree(state.rootPath);
+  } catch (e) {
+    console.error('createNewFolder error:', e);
+    window.alert(state.language === 'ru' ? 'Не удалось создать папку.' : 'Failed to create folder.');
+  }
+}
+
 // ===== KEYBOARD SHORTCUTS =====
 document.addEventListener('keydown', e => {
   if (e.ctrlKey || e.metaKey) {
@@ -396,9 +528,30 @@ document.getElementById('act-settings')?.addEventListener('click', () => activat
 ['btn-new-file','btn-new-file2'].forEach(id => {
   document.getElementById(id)?.addEventListener('click', newUntitledFile);
 });
+document.getElementById('btn-new-folder')?.addEventListener('click', createNewFolder);
+
+// Stepper buttons
+Array.from(document.querySelectorAll('[data-stepper]')).forEach(btn => {
+  btn.addEventListener('click', () => {
+    const kind = btn.getAttribute('data-stepper');
+    const delta = Number(btn.getAttribute('data-step'));
+    if (kind === 'fontSize') {
+      applyFontSize(Math.min(24, Math.max(10, state.fontSize + delta)));
+    } else if (kind === 'tabSize') {
+      applyTabSize(Math.min(8, Math.max(2, state.tabSize + delta)));
+    }
+  });
+});
 
 // Save button
 document.getElementById('btn-save')?.addEventListener('click', saveCurrentFile);
+
+// Close theme popover when clicking outside
+document.addEventListener('click', (event) => {
+  if (!els.themePopover?.contains(event.target) && !els.themeTrigger?.contains(event.target)) {
+    els.themePopover?.classList.add('hidden');
+  }
+});
 
 // Titlebar window controls
 document.getElementById('btn-close')?.addEventListener('click',    () => appWindow.close());
@@ -409,7 +562,20 @@ document.getElementById('btn-maximize')?.addEventListener('click', () => appWind
 els.setFontsize?.addEventListener('input',  e => applyFontSize(+e.target.value));
 els.setTabsize?.addEventListener('change',  e => applyTabSize(+e.target.value));
 els.setWordwrap?.addEventListener('change', e => applyWordWrap(e.target.checked));
-els.setTheme?.addEventListener('change',    e => applyTheme(e.target.value));
+els.setLanguage?.addEventListener('change', e => setLanguage(e.target.value));
+els.themeTrigger?.addEventListener('click', () => {
+  els.themePopover?.classList.toggle('hidden');
+});
+document.querySelectorAll('[data-theme-option]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const value = btn.getAttribute('data-theme-option');
+    applyTheme(value);
+    els.themePopover?.classList.add('hidden');
+  });
+});
+[els.customBaseColor, els.customTextColor, els.customAccentColor].forEach(input => {
+  input?.addEventListener('input', applyCustomTheme);
+});
 
 // Search
 els.searchInput?.addEventListener('input', e => {
@@ -432,5 +598,10 @@ els.searchInput?.addEventListener('input', e => {
 });
 
 // ===== INIT =====
+applyFontSize(state.fontSize);
+applyTabSize(state.tabSize);
+applyWordWrap(state.wordWrap);
+applyTheme(state.theme);
+setLanguage(state.language);
 updateGutter();
 renderTabs();
