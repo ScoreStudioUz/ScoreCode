@@ -30,7 +30,7 @@ jobs:
 
       - name: Ikonka yaratish
         run: |
-          mkdir -p src-tauri/icons
+          New-Item -ItemType Directory -Force -Path "src-tauri/icons" | Out-Null
           # PowerShell bilan minimal .ico yaratish
           powershell -Command "
             Add-Type -AssemblyName System.Drawing;
