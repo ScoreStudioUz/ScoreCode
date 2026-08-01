@@ -28,6 +28,31 @@ jobs:
         with:
           workspaces: src-tauri
 
+      - name: Ikonka yaratish
+        run: |
+          mkdir -p src-tauri/icons
+          # PowerShell bilan minimal .ico yaratish
+          powershell -Command "
+            Add-Type -AssemblyName System.Drawing;
+            \$bmp = New-Object System.Drawing.Bitmap(32, 32);
+            \$g = [System.Drawing.Graphics]::FromImage(\$bmp);
+            \$g.Clear([System.Drawing.Color]::FromArgb(255, 137, 180, 250));
+            \$font = New-Object System.Drawing.Font('Arial', 12, [System.Drawing.FontStyle]::Bold);
+            \$brush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(255, 30, 30, 46));
+            \$g.DrawString('S', \$font, \$brush, 6, 6);
+            \$bmp.Save('src-tauri/icons/32x32.png');
+            \$bmp128 = New-Object System.Drawing.Bitmap(128, 128);
+            \$g2 = [System.Drawing.Graphics]::FromImage(\$bmp128);
+            \$g2.Clear([System.Drawing.Color]::FromArgb(255, 137, 180, 250));
+            \$font2 = New-Object System.Drawing.Font('Arial', 60, [System.Drawing.FontStyle]::Bold);
+            \$g2.DrawString('S', \$font2, \$brush, 20, 20);
+            \$bmp128.Save('src-tauri/icons/128x128.png');
+            \$ico = [System.Drawing.Icon]::FromHandle(\$bmp.GetHicon());
+            \$stream = [System.IO.FileStream]::new('src-tauri/icons/icon.ico', [System.IO.FileMode]::Create);
+            \$ico.Save(\$stream);
+            \$stream.Close();
+          "
+
       - name: npm dependencies
         run: npm install
 
