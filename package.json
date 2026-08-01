@@ -1,10 +1,9 @@
 {
-  "name": "scoreedit",
+  "name": "ScoreCode",
   "version": "0.1.0",
-  "description": "ScoreEdit — lёgkiy redaktor koda",
+  "description": "ScoreCode - By ScoreStudio",
   "scripts": {
-    "dev":   "tauri dev",
-    "build": "tauri build"
+    "tauri": "tauri"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.6.0"
