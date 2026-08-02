@@ -5,28 +5,240 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ScoreCode</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- CodeMirror 6 — bundled via esm.sh CDN (works offline after first load) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "@codemirror/state":         "https://esm.sh/@codemirror/state@6.4.1",
+      "@codemirror/view":          "https://esm.sh/@codemirror/view@6.26.3",
+      "@codemirror/commands":      "https://esm.sh/@codemirror/commands@6.6.0",
+      "@codemirror/language":      "https://esm.sh/@codemirror/language@6.10.1",
+      "@codemirror/autocomplete":  "https://esm.sh/@codemirror/autocomplete@6.17.0",
+      "@codemirror/search":        "https://esm.sh/@codemirror/search@6.5.6",
+      "@codemirror/lang-javascript":"https://esm.sh/@codemirror/lang-javascript@6.2.2",
+      "@codemirror/lang-python":   "https://esm.sh/@codemirror/lang-python@6.1.6",
+      "@codemirror/lang-rust":     "https://esm.sh/@codemirror/lang-rust@6.0.1",
+      "@codemirror/lang-java":     "https://esm.sh/@codemirror/lang-java@6.0.1",
+      "@codemirror/lang-css":      "https://esm.sh/@codemirror/lang-css@6.2.1",
+      "@codemirror/lang-html":     "https://esm.sh/@codemirror/lang-html@6.4.9",
+      "@codemirror/lang-json":     "https://esm.sh/@codemirror/lang-json@6.0.1",
+      "@codemirror/lang-markdown": "https://esm.sh/@codemirror/lang-markdown@6.2.5",
+      "@codemirror/lang-sql":      "https://esm.sh/@codemirror/lang-sql@6.7.1",
+      "@codemirror/lang-cpp":      "https://esm.sh/@codemirror/lang-cpp@6.0.2",
+      "@codemirror/lang-go":       "https://esm.sh/@codemirror/lang-go@0.1.0",
+      "@lezer/highlight":          "https://esm.sh/@lezer/highlight@1.2.0"
+    }
+  }
+  </script>
 </head>
 <body>
+
+  <!-- Context Menu -->
+  <div class="context-menu hidden" id="context-menu">
+    <div class="ctx-item" data-action="new-file">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+      <span>Новый файл</span>
+    </div>
+    <div class="ctx-item" data-action="new-folder">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h9a2 2 0 012 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+      <span>Новая папка</span>
+    </div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item" data-action="rename">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      <span>Переименовать</span>
+      <span class="ctx-shortcut">F2</span>
+    </div>
+    <div class="ctx-item ctx-danger" data-action="delete">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      <span>Удалить</span>
+      <span class="ctx-shortcut">Del</span>
+    </div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item" data-action="copy-path">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      <span>Копировать путь</span>
+    </div>
+    <div class="ctx-item" data-action="open-in-explorer">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h9a2 2 0 012 2z"/></svg>
+      <span>Открыть в проводнике</span>
+    </div>
+  </div>
+
+  <!-- Tab Context Menu -->
+  <div class="context-menu hidden" id="tab-context-menu">
+    <div class="ctx-item" data-action="tab-close">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <span>Закрыть вкладку</span>
+      <span class="ctx-shortcut">Ctrl+W</span>
+    </div>
+    <div class="ctx-item" data-action="tab-close-others">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+      <span>Закрыть остальные</span>
+    </div>
+    <div class="ctx-item" data-action="tab-close-all">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+      <span>Закрыть все вкладки</span>
+    </div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item" data-action="tab-copy-path">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      <span>Копировать путь файла</span>
+    </div>
+  </div>
+
+  <!-- Theme Picker Modal -->
+  <div class="modal-overlay hidden" id="theme-modal-overlay">
+    <div class="theme-modal" id="theme-modal">
+      <div class="theme-modal-header">
+        <span>Выбрать тему</span>
+        <button class="theme-modal-close" id="theme-modal-close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="theme-options">
+        <div class="theme-option active" data-theme="dark" id="theme-opt-dark">
+          <div class="theme-preview theme-preview-dark">
+            <div class="tp-titlebar">
+              <span class="tp-dot tp-red"></span>
+              <span class="tp-dot tp-yellow"></span>
+              <span class="tp-dot tp-green"></span>
+            </div>
+            <div class="tp-body">
+              <div class="tp-sidebar">
+                <div class="tp-file"></div>
+                <div class="tp-file"></div>
+                <div class="tp-file active"></div>
+              </div>
+              <div class="tp-editor">
+                <div class="tp-line" style="width:80%"></div>
+                <div class="tp-line" style="width:55%;margin-left:14px"></div>
+                <div class="tp-line" style="width:65%;margin-left:14px"></div>
+                <div class="tp-line" style="width:40%"></div>
+              </div>
+            </div>
+            <div class="tp-statusbar"></div>
+          </div>
+          <div class="theme-option-info">
+            <span class="theme-name">Catppuccin Mocha</span>
+            <span class="theme-desc">Тёмная тема</span>
+          </div>
+          <div class="theme-check">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+
+        <div class="theme-option" data-theme="light" id="theme-opt-light">
+          <div class="theme-preview theme-preview-light">
+            <div class="tp-titlebar tp-titlebar-light">
+              <span class="tp-dot tp-red"></span>
+              <span class="tp-dot tp-yellow"></span>
+              <span class="tp-dot tp-green"></span>
+            </div>
+            <div class="tp-body">
+              <div class="tp-sidebar tp-sidebar-light">
+                <div class="tp-file tp-file-light"></div>
+                <div class="tp-file tp-file-light"></div>
+                <div class="tp-file tp-file-light active"></div>
+              </div>
+              <div class="tp-editor tp-editor-light">
+                <div class="tp-line tp-line-light" style="width:80%"></div>
+                <div class="tp-line tp-line-light" style="width:55%;margin-left:14px"></div>
+                <div class="tp-line tp-line-light" style="width:65%;margin-left:14px"></div>
+                <div class="tp-line tp-line-light" style="width:40%"></div>
+              </div>
+            </div>
+            <div class="tp-statusbar tp-statusbar-light"></div>
+          </div>
+          <div class="theme-option-info">
+            <span class="theme-name">Catppuccin Latte</span>
+            <span class="theme-desc">Светлая тема</span>
+          </div>
+          <div class="theme-check">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New File Dialog Modal -->
+  <div class="modal-overlay hidden" id="newfile-modal-overlay">
+    <div class="newfile-modal" id="newfile-modal">
+      <div class="newfile-modal-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+        <span>Новый файл</span>
+      </div>
+      <div class="newfile-location" id="newfile-location">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h9a2 2 0 012 2z"/></svg>
+        <span id="newfile-dir-label">Корневая папка</span>
+      </div>
+      <div class="newfile-input-wrap">
+        <input type="text" id="newfile-input" placeholder="filename.ext (например: main.py)" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="newfile-hint" id="newfile-type-hint">
+        <span id="newfile-ext-badge">TXT</span>
+        <span id="newfile-lang-hint">Текстовый файл</span>
+      </div>
+      <div class="newfile-actions">
+        <button class="newfile-btn-cancel" id="newfile-cancel">Отмена</button>
+        <button class="newfile-btn-create" id="newfile-create">Создать</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Folder Dialog Modal -->
+  <div class="modal-overlay hidden" id="newfolder-modal-overlay">
+    <div class="newfile-modal" id="newfolder-modal">
+      <div class="newfile-modal-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h9a2 2 0 012 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+        <span>Новая папка</span>
+      </div>
+      <div class="newfile-location">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h9a2 2 0 012 2z"/></svg>
+        <span id="newfolder-dir-label">Корневая папка</span>
+      </div>
+      <div class="newfile-input-wrap">
+        <input type="text" id="newfolder-input" placeholder="Название папки" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="newfile-actions">
+        <button class="newfile-btn-cancel" id="newfolder-cancel">Отмена</button>
+        <button class="newfile-btn-create" id="newfolder-create">Создать</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Title Bar -->
   <div class="titlebar" data-tauri-drag-region>
-    <div class="titlebar-dots">
-      <span class="dot dot-red" id="btn-close" title="Закрыть"></span>
-      <span class="dot dot-yellow" id="btn-minimize" title="Свернуть"></span>
-      <span class="dot dot-green" id="btn-maximize" title="Развернуть"></span>
+    <div class="titlebar-left" data-tauri-drag-region>
+      <div class="titlebar-logo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      </div>
+      <span class="titlebar-appname">ScoreCode</span>
     </div>
-    <span class="titlebar-title" id="titlebar-title">ScoreEdit</span>
-    <div class="titlebar-spacer"></div>
+    <span class="titlebar-title" id="titlebar-title"></span>
+    <div class="titlebar-controls" data-tauri-drag-region="false">
+      <button class="wc-btn wc-minimize" id="btn-minimize" title="Свернуть">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button class="wc-btn wc-maximize" id="btn-maximize" title="Развернуть">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      </button>
+      <button class="wc-btn wc-close" id="btn-close" title="Закрыть">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
   </div>
 
   <!-- App Body -->
   <div class="app">
 
-    <!-- Activity Bar (левая иконки) -->
+    <!-- Activity Bar -->
     <div class="activity-bar">
-      <button class="activity-btn active" id="act-explorer" title="Файлы">
+      <button class="activity-btn active" id="act-explorer" title="Проводник (Ctrl+B)">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
       </button>
-      <button class="activity-btn" id="act-search" title="Поиск">
+      <button class="activity-btn" id="act-search" title="Поиск (Ctrl+F)">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
       </button>
       <button class="activity-btn" id="act-settings" title="Настройки">
@@ -36,6 +248,7 @@
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
+
       <!-- Explorer Panel -->
       <div class="panel" id="panel-explorer">
         <div class="panel-header">
@@ -48,15 +261,18 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h9a2 2 0 012 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
             </button>
             <button class="panel-btn" id="btn-open-folder" title="Открыть папку">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h9a2 2 0 012 2z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5"/></svg>
+            </button>
+            <button class="panel-btn" id="btn-collapse-sidebar" title="Свернуть проводник">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
           </div>
         </div>
         <div class="file-tree" id="file-tree">
           <div class="tree-empty" id="tree-empty">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h9a2 2 0 012 2z"/></svg>
-            <p id="tree-empty-text">Папка не открыта</p>
-            <button class="btn-open" id="btn-open-folder2" data-i18n="welcomeOpen">Открыть папку</button>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
+            <p>Папка не открыта</p>
+            <button class="btn-open" id="btn-open-folder2">Открыть папку</button>
           </div>
         </div>
       </div>
@@ -75,60 +291,59 @@
       <!-- Settings Panel -->
       <div class="panel hidden" id="panel-settings">
         <div class="panel-header">
-          <span class="panel-title" data-i18n="settings">НАСТРОЙКИ</span>
+          <span class="panel-title">НАСТРОЙКИ</span>
         </div>
         <div class="settings-list">
+
+          <div class="setting-group">Редактор</div>
+
           <label class="setting-item">
-            <span data-i18n="fontSize">Размер шрифта</span>
-            <div class="stepper">
-              <button class="stepper-btn" type="button" data-stepper="fontSize" data-step="-1">−</button>
-              <input type="number" id="set-fontsize" value="14" min="10" max="24" />
-              <button class="stepper-btn" type="button" data-stepper="fontSize" data-step="1">+</button>
+            <div class="setting-label">
+              <span class="setting-name">Размер шрифта</span>
+              <span class="setting-desc">Размер шрифта в редакторе</span>
+            </div>
+            <div class="setting-stepper">
+              <button class="stepper-btn" id="fontsize-dec">−</button>
+              <span class="stepper-val" id="fontsize-display">14</span>
+              <button class="stepper-btn" id="fontsize-inc">+</button>
             </div>
           </label>
+
           <label class="setting-item">
-            <span data-i18n="tabSize">Табуляция</span>
-            <div class="stepper">
-              <button class="stepper-btn" type="button" data-stepper="tabSize" data-step="-1">−</button>
-              <input type="number" id="set-tabsize" value="4" min="2" max="8" />
-              <button class="stepper-btn" type="button" data-stepper="tabSize" data-step="1">+</button>
+            <div class="setting-label">
+              <span class="setting-name">Табуляция</span>
+              <span class="setting-desc">Ширина отступа в пробелах</span>
+            </div>
+            <div class="setting-tabs-select">
+              <button class="tab-size-btn active" data-size="2">2</button>
+              <button class="tab-size-btn" data-size="4">4</button>
+              <button class="tab-size-btn" data-size="8">8</button>
             </div>
           </label>
+
           <label class="setting-item">
-            <span data-i18n="wordWrap">Перенос строк</span>
-            <input type="checkbox" id="set-wordwrap" />
+            <div class="setting-label">
+              <span class="setting-name">Перенос строк</span>
+              <span class="setting-desc">Переносить длинные строки</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="set-wordwrap" />
+              <span class="toggle-slider"></span>
+            </label>
           </label>
-          <label class="setting-item">
-            <span data-i18n="theme">Тема</span>
-            <button class="theme-pill" type="button" id="theme-trigger">
-              <span id="theme-trigger-label">Default</span>
-            </button>
-          </label>
-          <div class="theme-popover hidden" id="theme-popover">
-            <button class="theme-option" type="button" data-theme-option="default">Default</button>
-            <button class="theme-option" type="button" data-theme-option="custom">Custom</button>
-            <div class="custom-theme-controls hidden" id="custom-theme-controls">
-              <label>
-                <span>Base</span>
-                <input type="color" id="custom-base-color" value="#111827" />
-              </label>
-              <label>
-                <span>Text</span>
-                <input type="color" id="custom-text-color" value="#f8fafc" />
-              </label>
-              <label>
-                <span>Accent</span>
-                <input type="color" id="custom-accent-color" value="#38bdf8" />
-              </label>
+
+          <div class="setting-group" style="margin-top:6px">Внешний вид</div>
+
+          <div class="setting-item setting-item-clickable" id="open-theme-modal">
+            <div class="setting-label">
+              <span class="setting-name">Тема оформления</span>
+              <span class="setting-desc" id="current-theme-label">Catppuccin Mocha</span>
+            </div>
+            <div class="setting-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
           </div>
-          <label class="setting-item">
-            <span data-i18n="language">Язык</span>
-            <select id="set-language">
-              <option value="ru">Русский</option>
-              <option value="en">English</option>
-            </select>
-          </label>
+
         </div>
       </div>
     </div>
@@ -148,36 +363,38 @@
         </div>
       </div>
 
-      <!-- Editor + No tabs welcome -->
+      <!-- Editor + Welcome -->
       <div class="editor-wrapper" id="editor-wrapper">
         <!-- Welcome screen -->
         <div class="welcome" id="welcome">
           <div class="welcome-content">
-            <div class="welcome-logo">SE</div>
+            <div class="welcome-logo">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
             <h1>ScoreCode</h1>
-            <p id="welcome-message" data-i18n="welcomeTitle">Лёгкий редактор кода</p>
+            <p>Лёгкий редактор кода</p>
             <div class="welcome-actions">
-              <button class="welcome-btn" id="btn-open-folder3" data-i18n="welcomeOpen">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h9a2 2 0 012 2z"/></svg>
+              <button class="welcome-btn" id="btn-open-folder3">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5"/></svg>
                 Открыть папку
               </button>
-              <button class="welcome-btn" id="btn-new-file2" data-i18n="welcomeNewFile">
+              <button class="welcome-btn" id="btn-new-file2">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                 Новый файл
               </button>
             </div>
             <div class="welcome-shortcuts">
-              <div class="shortcut"><kbd>Ctrl+S</kbd><span data-i18n-shortcut="save">Сохранить</span></div>
-              <div class="shortcut"><kbd>Ctrl+W</kbd><span data-i18n-shortcut="close">Закрыть вкладку</span></div>
-              <div class="shortcut"><kbd>Ctrl+Tab</kbd><span data-i18n-shortcut="next">Следующая вкладка</span></div>
+              <div class="shortcut"><kbd>Ctrl+S</kbd><span>Сохранить</span></div>
+              <div class="shortcut"><kbd>Ctrl+W</kbd><span>Закрыть вкладку</span></div>
+              <div class="shortcut"><kbd>Ctrl+B</kbd><span>Проводник</span></div>
+              <div class="shortcut"><kbd>Ctrl+N</kbd><span>Новый файл</span></div>
             </div>
           </div>
         </div>
 
-        <!-- Code Editor -->
+        <!-- Code Editor (CodeMirror 6) -->
         <div class="editor-container hidden" id="editor-container">
-          <div class="editor-gutter" id="editor-gutter"></div>
-          <textarea class="editor-textarea" id="editor-textarea" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+          <div id="cm-host" style="height:100%;width:100%;overflow:hidden;"></div>
         </div>
       </div>
 
@@ -199,6 +416,6 @@
     </div>
   </div>
 
-  <script src="main.js"></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>
