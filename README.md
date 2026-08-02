@@ -1,60 +1,57 @@
-# ScoreEdit 🎨
+# ScoreCode 0.3.0
 
-Лёгкий редактор кода на Tauri (Rust + HTML/CSS/JS).  
-Тема: Catppuccin Mocha (тёмная) / Latte (светлая).
+**Real kod editor** — Tauri (Rust backend) + CodeMirror 6 (editor engine).
 
-## Установка на D:
+## Arxitektura
 
-### 1. Переменные среды (ПЕРЕД установкой Rust)
-Win+R → `sysdm.cpl` → Дополнительно → Переменные среды:
 ```
-RUSTUP_HOME = D:\Rust\rustup
-CARGO_HOME  = D:\Rust\cargo
-```
-
-### 2. Установить Rust
-Скачай: https://rustup.rs  
-При установке выбери "Customize" и укажи D:\Rust
-
-### 3. Установить Node.js
-Скачай: https://nodejs.org  
-При установке измени путь на D:\NodeJS
-
-### 4. Перенести проект на D:
-```cmd
-D:
-mkdir D:\projects
-xcopy /E /I C:\путь\к\scoreedit D:\projects\scoreedit
-cd D:\projects\scoreedit
+┌─────────────────────────────────────────────────────┐
+│                   ScoreCode 0.3.0                    │
+│                                                      │
+│  Rust (src-tauri/src/main.rs)   JS (src/main.js)    │
+│  ════════════════════════════   ═══════════════════  │
+│  ✅ read_directory              ✅ CodeMirror 6      │
+│  ✅ read_file (UTF-8)           ✅ Syntax highlight  │
+│  ✅ write_file                  ✅ Bracket matching  │
+│  ✅ create_file                 ✅ Autocomplete      │
+│  ✅ create_directory            ✅ Fold/unfold       │
+│  ✅ delete_path (file+dir)      ✅ Search/replace    │
+│  ✅ rename_path                 ✅ UI / Tabs         │
+│  ✅ search_in_files (fast)      ✅ Modals            │
+│  ✅ start_watching (notify)     ✅ Context menus     │
+│  ✅ stop_watching               ✅ Theme switcher    │
+│  ✅ load_settings (JSON)        ✅ Settings panel    │
+│  ✅ save_settings               ✅ File watcher UI   │
+│  ✅ get_settings_path           ✅ Search results    │
+└─────────────────────────────────────────────────────┘
 ```
 
-### 5. Запуск
-```cmd
+## Supported languages (syntax highlighting)
+
+Rust, JavaScript, TypeScript, JSX/TSX, Python, Java, Kotlin,
+CSS/SCSS, HTML, Vue, Svelte, JSON, Markdown, SQL, C, C++, Go
+
+## Settings file location
+
+- **Windows:** `%APPDATA%\scorecode\settings.json`
+- **macOS:** `~/Library/Application Support/scorecode/settings.json`
+- **Linux:** `~/.config/scorecode/settings.json`
+
+## Build
+
+```bash
 npm install
-npm run dev
+npm run tauri build
 ```
 
-### 6. Сборка (финальный .exe)
-```cmd
-npm run build
+## Dev
+
+```bash
+npm run tauri dev
 ```
-Файл будет в: `src-tauri\target\release\ScoreEdit.exe`
 
-## Возможности
-- 📁 Файловый менеджер слева
-- 🗂 Вкладки (tabs) с отметкой изменений
-- 🌙 Тёмная тема Catppuccin Mocha
-- ☀️ Светлая тема Catppuccin Latte
-- 🔢 Номера строк
-- 🔍 Поиск по открытым файлам
-- ⚙️ Настройки (размер шрифта, табуляция, перенос)
-- ⌨️ Горячие клавиши: Ctrl+S, Ctrl+W, Ctrl+N, Ctrl+Tab
+## New Cargo dependencies
 
-## Горячие клавиши
-| Клавиша    | Действие              |
-|------------|-----------------------|
-| Ctrl+S     | Сохранить файл        |
-| Ctrl+N     | Новый файл            |
-| Ctrl+W     | Закрыть вкладку       |
-| Ctrl+Tab   | Следующая вкладка     |
-| Tab        | Отступ (4 пробела)    |
+- `notify = "6.1"` — file system watcher (papka o'zgarishlarini kuzatadi)
+- `walkdir = "2.4"` — rekursiv papka qidirish
+- `dirs = "5.0"` — OS-specific config/home directory topish

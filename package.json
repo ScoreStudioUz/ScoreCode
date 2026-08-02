@@ -1,14 +1,14 @@
 {
   "name": "scorecode",
-  "version": "0.1.0",
-  "description": "ScoreCode - By ScoreStudio",
+  "version": "0.2.0",
+  "description": "ScoreCode — lightweight code editor by ScoreStudio",
   "scripts": {
     "tauri": "tauri"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.6.0"
+    "@tauri-apps/cli": "^1.0.0"
   },
   "dependencies": {
-    "@tauri-apps/api": "^1.6.0"
+    "@tauri-apps/api": "^1.0.0"
   }
 }

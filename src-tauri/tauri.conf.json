@@ -7,52 +7,37 @@
   },
   "package": {
     "productName": "ScoreCode",
-    "version": "0.1.0"
+    "version": "0.3.0"
   },
   "tauri": {
     "allowlist": {
-      "dialog": {
-        "open": true,
-        "save": true
-      },
+      "dialog": { "open": true, "save": true },
       "fs": {
-        "readFile": true,
-        "writeFile": true,
-        "readDir": true,
+        "readFile": true, "writeFile": true, "readDir": true,
+        "createDir": true, "removeDir": true, "removeFile": true,
+        "renameFile": true, "exists": true,
         "scope": ["**"]
       },
+      "clipboard": { "writeText": true, "readText": true },
+      "shell": { "open": true },
       "window": {
-        "close": true,
-        "minimize": true,
-        "maximize": true,
-        "unmaximize": true
+        "close": true, "minimize": true,
+        "maximize": true, "unmaximize": true, "setTitle": true
       }
     },
     "bundle": {
       "active": true,
       "targets": "all",
       "identifier": "uz.scorestudio.scorecode",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/icon.ico"
-      ]
+      "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.ico"]
     },
-    "security": {
-      "csp": null
-    },
-    "windows": [
-      {
-        "title": "ScoreCode",
-        "width": 1200,
-        "height": 760,
-        "minWidth": 700,
-        "minHeight": 400,
-        "decorations": false,
-        "transparent": false,
-        "resizable": true,
-        "center": true
-      }
-    ]
+    "security": { "csp": null },
+    "windows": [{
+      "title": "ScoreCode",
+      "width": 1200, "height": 760,
+      "minWidth": 700, "minHeight": 400,
+      "decorations": false, "transparent": false,
+      "resizable": true, "center": true
+    }]
   }
 }
